@@ -54,52 +54,21 @@ public class StudentService extends Student{
         return s;
     }
 
-    public String deleteStudent(Integer stdID) {
+    public String deleteStudent(Integer stdID) {       //OK
         //ดัก student ID ซ้ำ + server error
 
-        String notFoundStudentMessage = new String ("Cannot found student ID :" + stdID + "!");
-        String deleteSuccessMessage = new String ("Delete student ID :" + stdID + " successfully!");
+        String notFoundStudentMessage = new String("Cannot found student ID :" + stdID + "!");
+        String deleteSuccessMessage = new String("Delete student ID :" + stdID + " successfully!");
         Student s = studentRepository.findBystdID(stdID);
-        try{
-            studentRepository.deleteById(s.getId());
-        }catch (NullPointerException e){
-            throw new NullPointerException(notFoundStudentMessage);
-        }
-
-        throw new NullPointerException(deleteSuccessMessage);
-
-    }
-
-    //String deleteMessage = new String ("Cannot found student ID :" + stdID + "!");
-    /*public String deleteStudent(Integer stdID) {
-        //ดัก student ID ซ้ำ + server error
-
-        String notFoundStudentMessage = new String ("Cannot found student ID :" + stdID + "!");
-        String deleteSuccessMessage = new String ("Delete student ID :" + stdID + " successfully!");
-        Student s = studentRepository.findBystdID(stdID);
-
-        if(!(checkStudentIdNotFound(s.getStdID()))) {
-            studentRepository.deleteById(s.getId());
-            return message = deleteSuccessMessage;
-        }else
-            return message = notFoundStudentMessage;
-            //throw new NullPointerException(message);
-    }*/
-
-    /*public String deleteStudent(Integer stdID) {
-        //ดัก student ID ซ้ำ + server error
-        String deleteSuccessMessage = new String("Delete student successfully!");
-        Student s = studentRepository.findBystdID(stdID);
-
         try {
-            checkStudentIdNotFound(stdID);
-        }catch (NullPointerException e){
-            System.out.println("Caught inside deleteStudent().");
-            throw e;
+            studentRepository.deleteById(s.getId());
+        } catch (NullPointerException e) {
+            message = notFoundStudentMessage;
+        } catch (RuntimeException e) {
+            message = deleteSuccessMessage;
         }
-        studentRepository.deleteById(s.getId());
-        return deleteSuccessMessage;
-}*/
+        return message;
+    }
 
     public void updateStudentFirstName(Integer stdID, String fName) {
         //ดัก student ID ซ้ำ + server error
@@ -108,12 +77,12 @@ public class StudentService extends Student{
         studentRepository.save(s);
     }
 
-    /*public boolean checkStudentIdNotFound(Integer stdID){
+    public Boolean checkStudentId(Integer stdID){
 
         Student s = studentRepository.findBystdID(stdID);
         if (s.getId() != null) {
             return true;
         }
         return false;
-    }*/
+    }
 }
