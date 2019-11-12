@@ -18,7 +18,8 @@ public class StudentService extends Student{
     @Autowired
     StudentRepository studentRepository;
 
-    private String message = new String();
+    private String deleteMessage = new String();
+    private String updateMessage = new String();
 
     public List <Collection<Student>> showAllStudents() {
         //ดัก ไม่พบ student สักคน + server error
@@ -56,33 +57,42 @@ public class StudentService extends Student{
 
     public String deleteStudent(Integer stdID) {       //OK
         //ดัก student ID ซ้ำ + server error
-
         String notFoundStudentMessage = new String("Cannot found student ID :" + stdID + "!");
         String deleteSuccessMessage = new String("Delete student ID :" + stdID + " successfully!");
-        Student s = studentRepository.findBystdID(stdID);
+
         try {
+            Student s = studentRepository.findBystdID(stdID);
             studentRepository.deleteById(s.getId());
         } catch (NullPointerException e) {
-            message = notFoundStudentMessage;
+            deleteMessage = notFoundStudentMessage;
         } catch (RuntimeException e) {
-            message = deleteSuccessMessage;
+            deleteMessage = deleteSuccessMessage;
         }
-        return message;
+        return deleteMessage;
     }
 
-    public void updateStudentFirstName(Integer stdID, String fName) {
+    public String updateStudentFirstName(Integer stdID, String fName) {
         //ดัก student ID ซ้ำ + server error
-        Student s = studentRepository.findBystdID(stdID);
-        s.setFName(fName);
-        studentRepository.save(s);
+        String notFoundStudentMessage = new String("Cannot found student ID :" + stdID + "!");
+        String updateSuccessMessage = new String("Update First name for student ID :" + stdID + " successfully!, New first name is : " + fName);
+
+        try {
+            Student s = studentRepository.findBystdID(stdID);
+            s.setFName(fName);
+            studentRepository.save(s);
+            updateMessage = updateSuccessMessage;
+        } catch (NullPointerException e) {
+            updateMessage = notFoundStudentMessage;
+        }
+        return updateMessage;
     }
 
-    public Boolean checkStudentId(Integer stdID){
+    /*public Boolean checkStudentId(Integer stdID){
 
         Student s = studentRepository.findBystdID(stdID);
         if (s.getId() != null) {
             return true;
         }
         return false;
-    }
+    }*/
 }

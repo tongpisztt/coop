@@ -52,7 +52,7 @@ public class StudentController {
 
     //http://localhost:8080/update/62001/Jundara
     @PutMapping(path ="/update/{stdID}/{fName}")
-    public void updateStudentFirstName(@PathVariable Integer stdID,@PathVariable String fName) {
-        studentService.updateStudentFirstName(stdID, fName);
+    public String updateStudentFirstName(@PathVariable Integer stdID,@PathVariable String fName) {
+        return studentService.updateStudentFirstName(stdID, fName);
     }
 }
