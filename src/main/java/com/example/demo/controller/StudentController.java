@@ -40,7 +40,7 @@ public class StudentController {
 
     //http://localhost:8080/addStudent
     @PostMapping("/add")
-    public Student addStudent(@RequestBody StudentRequest request) {
+    public String addStudent(@RequestBody StudentRequest request) {
         return studentService.saveStudent(request);
     }
 

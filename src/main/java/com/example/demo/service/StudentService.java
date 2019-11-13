@@ -6,6 +6,7 @@ import com.example.demo.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.NonUniqueResultException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,6 +19,7 @@ public class StudentService extends Student{
     @Autowired
     StudentRepository studentRepository;
 
+    private String saveMessage = new String();
     private String deleteMessage = new String();
     private String updateMessage = new String();
 
@@ -28,31 +30,27 @@ public class StudentService extends Student{
         return list;
     }
 
-    /*public Student showStudent(Integer stdID) {
-        try{
-            if (checkStudentIdNotFound(stdID)){
-
-            }
-            System.out.println(message);
-        }catch (NullPointerException e){
-            System.out.println("Cannot found student ID");
-            throw e; // rethrowing the exception
-        }
-        Student find = studentRepository.findBystdID(stdID);
-        return find;
-    }*/
-
     public Student showStudent(Integer stdID) {
         //ดัก หา student ID ไม่เจอ + server error
         Student find = studentRepository.findBystdID(stdID);
         return find;
     }
 
-    public Student saveStudent(StudentRequest request) {
+    public String saveStudent(StudentRequest request) {
+        String repeatStudentMessage = new String("This student ID :" + request.getStdID() + " have been already save in database!");
+        String saveSuccessMessage = new String("Save student ID :" + request.getStdID() + " successfully!");
         //ดัก student ID ซ้ำ + server error
-        Student s = new Student(request.getId(), request.getStdID(),request.getFName(),request.getLName(),request.getAge());
-        studentRepository.save(s);
-        return s;
+        int check = 0;
+            check = checkRepeatStudentId(request);
+            List<Student> originalStudentList = studentRepository.findAll();
+            if (check == 0) {
+                Student s = new Student(request.getStdID(), request.getFName(), request.getLName(), request.getAge());
+                studentRepository.save(s);
+                saveMessage = saveSuccessMessage;
+            } else {
+                saveMessage = repeatStudentMessage;
+            }
+        return saveMessage;
     }
 
     public String deleteStudent(Integer stdID) {       //OK
@@ -85,6 +83,21 @@ public class StudentService extends Student{
             updateMessage = notFoundStudentMessage;
         }
         return updateMessage;
+    }
+
+    public int checkRepeatStudentId(StudentRequest request){
+        int counter = 0;
+        List<Student> originalStudentList = studentRepository.findAll();
+        System.out.println("This is number of students : " + originalStudentList.size());
+
+        for (int i = 0; i < originalStudentList.size(); i++) {
+            System.out.println(request.getStdID() +":"+ originalStudentList.get(i).getStdID());
+            //if (request.getStdID() == originalStudentList.get(i).getStdID()) equals
+            if (request.getStdID().equals(originalStudentList.get(i).getStdID()))
+                counter++;
+        }
+        System.out.println("now counter is : " + counter);
+        return counter;
     }
 
     /*public Boolean checkStudentId(Integer stdID){
