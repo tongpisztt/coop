@@ -2,11 +2,14 @@ package com.example.demo.controller;
 
 
 import com.example.demo.entity.Student;
+import com.example.demo.exception.BusinessException;
 import com.example.demo.model.StudentRequest;
 import com.example.demo.repository.StudentRepository;
 import com.example.demo.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -34,14 +37,28 @@ public class StudentController {
 
     //http://localhost:8080/students//getStudent/62002
     @GetMapping(path = "/getStudent/{stdID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Student getStudent(@PathVariable Integer stdID) {
-        return studentService.showStudent(stdID);
+    public Student getStudent(@PathVariable Integer stdID) throws BusinessException {
+        Student s = new Student();
+        try {
+            s = studentService.showStudent(stdID);
+        }catch (BusinessException e){
+            throw new BusinessException(e.getCode(), e.getMessage());
+        }
+        return s;
     }
 
     //http://localhost:8080/addStudent
     @PostMapping("/add")
-    public String addStudent(@RequestBody StudentRequest request) {
-        return studentService.saveStudent(request);
+    public ResponseEntity<?> addStudent(@RequestBody StudentRequest request) {
+        try {
+            return new ResponseEntity<Student>(studentService.saveStudent(request), HttpStatus.OK);
+        } catch (BusinessException e) {
+            if (e.getCode() == 10001) {
+                return new ResponseEntity<String>("Student id is existing in system", HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<String>("System Error", HttpStatus.BAD_GATEWAY);
+            }
+        }
     }
 
     //http://localhost:8080/delete/62006

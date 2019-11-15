@@ -1,16 +1,18 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.Student;
+import com.example.demo.exception.BusinessException;
 import com.example.demo.model.StudentRequest;
 import com.example.demo.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.NonUniqueResultException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.example.demo.constant.StudentConstant.ERROR_SAVE_DB;
 
 //@Component
 @Service
@@ -30,27 +32,41 @@ public class StudentService extends Student{
         return list;
     }
 
-    public Student showStudent(Integer stdID) {
+    public Student showStudent(Integer stdID) throws BusinessException {
         //ดัก หา student ID ไม่เจอ + server error
-        Student find = studentRepository.findBystdID(stdID);
-        return find;
+        //StudentService service = new StudentService();
+        Student thisStudent = studentRepository.findBystdID(stdID);
+
+            //service.findStudentInDatabase(thisStudent);
+        if(thisStudent == null)
+            throw new BusinessException(ERROR_SAVE_DB);
+        else
+            return thisStudent;
     }
 
-    public String saveStudent(StudentRequest request) {
-        String repeatStudentMessage = new String("This student ID :" + request.getStdID() + " have been already save in database!");
+    public Student saveStudent(StudentRequest request) throws BusinessException {     //OK
+        String repeatStudentMessage = String.format("This student ID : %s have been already save in database!", request.getStdID());
+
         String saveSuccessMessage = new String("Save student ID :" + request.getStdID() + " successfully!");
         //ดัก student ID ซ้ำ + server error
-        int check = 0;
-            check = checkRepeatStudentId(request);
-            List<Student> originalStudentList = studentRepository.findAll();
-            if (check == 0) {
-                Student s = new Student(request.getStdID(), request.getFName(), request.getLName(), request.getAge());
-                studentRepository.save(s);
-                saveMessage = saveSuccessMessage;
-            } else {
-                saveMessage = repeatStudentMessage;
-            }
-        return saveMessage;
+        if (checkExistingStudentId(request)) {
+            throw new BusinessException(10001, "PK is existing.");
+        }
+
+        Student s = new Student(request.getStdID(), request.getFName(), request.getLName(), request.getAge());
+        return studentRepository.save(s);
+
+//        int check = 0;
+//            check = checkRepeatStudentId(request);
+//            List<Student> originalStudentList = studentRepository.findAll();
+//            if (check == 0) {
+//                Student s = new Student(request.getStdID(), request.getFName(), request.getLName(), request.getAge());
+//                studentRepository.save(s);
+//                saveMessage = saveSuccessMessage;
+//            } else {
+//                saveMessage = repeatStudentMessage;
+//            }
+//        return saveMessage;
     }
 
     public String deleteStudent(Integer stdID) {       //OK
@@ -70,7 +86,7 @@ public class StudentService extends Student{
     }
 
     public String updateStudentFirstName(Integer stdID, String fName) {
-        //ดัก student ID ซ้ำ + server error
+        //ดัก student ID ซ้ำ + server error + ไม่พบ student
         String notFoundStudentMessage = new String("Cannot found student ID :" + stdID + "!");
         String updateSuccessMessage = new String("Update First name for student ID :" + stdID + " successfully!, New first name is : " + fName);
 
@@ -85,27 +101,17 @@ public class StudentService extends Student{
         return updateMessage;
     }
 
-    public int checkRepeatStudentId(StudentRequest request){
+    public boolean checkExistingStudentId(StudentRequest request){        //OK
         int counter = 0;
-        List<Student> originalStudentList = studentRepository.findAll();
-        System.out.println("This is number of students : " + originalStudentList.size());
-
-        for (int i = 0; i < originalStudentList.size(); i++) {
-            System.out.println(request.getStdID() +":"+ originalStudentList.get(i).getStdID());
-            //if (request.getStdID() == originalStudentList.get(i).getStdID()) equals
-            if (request.getStdID().equals(originalStudentList.get(i).getStdID()))
-                counter++;
-        }
-        System.out.println("now counter is : " + counter);
-        return counter;
+        Student student = studentRepository.findBystdID(request.getStdID());
+//        System.out.println("This is number of students : " + originalStudentList.size());
+//
+//        for (int i = 0; i < originalStudentList.size(); i++) {
+//            System.out.println(request.getStdID() +":"+ originalStudentList.get(i).getStdID());
+//            if (request.getStdID().equals(originalStudentList.get(i).getStdID()))
+//                counter++;
+//        }
+//        System.out.println("now counter is : " + counter);
+        return student != null;
     }
-
-    /*public Boolean checkStudentId(Integer stdID){
-
-        Student s = studentRepository.findBystdID(stdID);
-        if (s.getId() != null) {
-            return true;
-        }
-        return false;
-    }*/
 }
