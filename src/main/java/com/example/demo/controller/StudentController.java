@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.List;
 
+import static com.example.demo.constant.StudentConstant.*;
+
 @RestController
 @RequestMapping("students")
 public class StudentController {
@@ -31,12 +33,21 @@ public class StudentController {
 
     //http://localhost:8080/students
     @GetMapping("/all")
-    public List <Collection<Student>> getStudents() {
-        return studentService.showAllStudents();
+    //public List <Collection<Student>> getStudents() {
+    public ResponseEntity<?> getStudents() {
+        try{
+            return new ResponseEntity<List<Collection<Student>>>(studentService.showAllStudents(), HttpStatus.OK);
+        }catch (BusinessException e) {
+            if (e.getCode() == 10003) {
+                return new ResponseEntity<String>(ERROR_NOT_FOUND_ANY_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<String>("System Error", HttpStatus.BAD_GATEWAY);
+            }
+        }
     }
 
     //http://localhost:8080/students//getStudent/62002
-    @GetMapping(path = "/getStudent/{stdID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/getStudent/{stdID}")
     public Student getStudent(@PathVariable Integer stdID) throws BusinessException {
         Student s = new Student();
         try {
@@ -54,7 +65,7 @@ public class StudentController {
             return new ResponseEntity<Student>(studentService.saveStudent(request), HttpStatus.OK);
         } catch (BusinessException e) {
             if (e.getCode() == 10001) {
-                return new ResponseEntity<String>("Student id is existing in system", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<String>(ERROR_EXISTING_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
             } else {
                 return new ResponseEntity<String>("System Error", HttpStatus.BAD_GATEWAY);
             }
@@ -63,13 +74,29 @@ public class StudentController {
 
     //http://localhost:8080/delete/62006
     @DeleteMapping(path ="/delete/{stdID}")
-    public String deleteStudent(@PathVariable Integer stdID) {
-        return studentService.deleteStudent(stdID);
+    public ResponseEntity<?> deleteStudent(@PathVariable Integer stdID) {
+        try {
+            return new ResponseEntity<String>(studentService.deleteStudent(stdID), HttpStatus.OK);
+        } catch (BusinessException e) {
+            if (e.getCode() == 10002) {
+                return new ResponseEntity<String>(ERROR_NOT_FOUND_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<String>("System Error", HttpStatus.BAD_GATEWAY);
+            }
+        }
     }
 
     //http://localhost:8080/update/62001/Jundara
     @PutMapping(path ="/update/{stdID}/{fName}")
-    public String updateStudentFirstName(@PathVariable Integer stdID,@PathVariable String fName) {
-        return studentService.updateStudentFirstName(stdID, fName);
+    public ResponseEntity<?> updateStudentFirstName(@PathVariable Integer stdID,@PathVariable String fName) {
+        try{
+            return new ResponseEntity<Student>(studentService.updateStudentFirstName(stdID, fName), HttpStatus.OK);
+        }catch (BusinessException e) {
+            if (e.getCode() == 10002) {
+                return new ResponseEntity<String>(ERROR_NOT_FOUND_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<String>("System Error", HttpStatus.BAD_GATEWAY);
+            }
+        }
     }
 }
