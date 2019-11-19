@@ -8,7 +8,6 @@ import com.example.demo.repository.StudentRepository;
 import com.example.demo.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,13 +26,8 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
-    public StudentController(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
-    }
-
     //http://localhost:8080/students
     @GetMapping("/all")
-    //public List <Collection<Student>> getStudents() {
     public ResponseEntity<?> getStudents() {
         try{
             return new ResponseEntity<List<Collection<Student>>>(studentService.showAllStudents(), HttpStatus.OK);
@@ -48,14 +42,16 @@ public class StudentController {
 
     //http://localhost:8080/students//getStudent/62002
     @GetMapping(path = "/getStudent/{stdID}")
-    public Student getStudent(@PathVariable Integer stdID) throws BusinessException {
-        Student s = new Student();
+    public ResponseEntity<?> getStudent(@PathVariable Integer stdID){
         try {
-            s = studentService.showStudent(stdID);
+            return new ResponseEntity<Student>(studentService.showStudent(stdID), HttpStatus.OK);
         }catch (BusinessException e){
-            throw new BusinessException(e.getCode(), e.getMessage());
+            if (e.getCode() == 10002) {
+                return new ResponseEntity<String>(ERROR_NOT_FOUND_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<String>("System Error", HttpStatus.BAD_GATEWAY);
+            }
         }
-        return s;
     }
 
     //http://localhost:8080/addStudent

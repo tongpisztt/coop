@@ -33,10 +33,9 @@ public class StudentService extends Student{
 
     public Student showStudent(Integer stdID) throws BusinessException {
         //ดัก หา student ID ไม่เจอ + server error
-        Student thisStudent = studentRepository.findBystdID(stdID);
-        if(thisStudent == null)
+        if(studentRepository.findBystdID(stdID) == null)
             throw new BusinessException(10002, ERROR_NOT_FOUND_STUDENT_IN_DB);
-        return thisStudent;
+        return studentRepository.findBystdID(stdID);
     }
 
     public Student saveStudent(StudentRequest request) throws BusinessException {     //OK
@@ -69,8 +68,9 @@ public class StudentService extends Student{
         return studentRepository.save(thisStudent);
     }
 
-    public boolean checkExistingStudentId(StudentRequest request){        //OK
+    private boolean checkExistingStudentId(StudentRequest request){        //OK
         Student student = studentRepository.findBystdID(request.getStdID());
-        return student != null; //ถ้ามี Student นี้อยู่แล้ว(!=null)? true : false
+        return student != null && student.getStdID().equals(request.getStdID());
+        //ถ้ามี Student นี้อยู่แล้ว ได้ true && ถ้า student.getStdID = request.getStdID() จะได้ true => คืน true แปลว่า Existing
     }
 }

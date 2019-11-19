@@ -13,7 +13,6 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor //generate constructors with all of arguments (stdID,fName,lName,age)
 public class StudentRequest {
 
-    @NotNull
     @Column(unique = true)
     private Long id;
 
@@ -38,4 +37,19 @@ public class StudentRequest {
     @Range(min=1, max=120, message = "{Age Must between 1-120 years old}")
     @Pattern(regexp = "[0-9]+", message = "{Age must be only numbers}")
     private Integer age;
+
+    /*public StudentRequest(Long id, Integer stdID, String fName, String lName, Integer age){
+        this.id = id;
+        this.stdID = stdID;
+        this.fName = fName;
+        this.lName = lName;
+        this.age = age;
+    }*/
+
+    public StudentRequest(Integer stdID, String fName, String lName, Integer age){
+        this.stdID = stdID;
+        this.fName = fName;
+        this.lName = lName;
+        this.age = age;
+    }
 }
