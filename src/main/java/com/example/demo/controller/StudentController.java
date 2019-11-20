@@ -28,7 +28,7 @@ public class StudentController {
 
     //http://localhost:8080/students
     @GetMapping("/all")
-    public ResponseEntity<?> getStudents() {
+    public ResponseEntity<?> getAllStudents() {
         try{
             return new ResponseEntity<List<Collection<Student>>>(studentService.showAllStudents(), HttpStatus.OK);
         }catch (BusinessException e) {

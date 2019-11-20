@@ -52,4 +52,15 @@ public class StudentRequest {
         this.lName = lName;
         this.age = age;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\": " + id + "," +
+                "\"stdID\": " + stdID + "," +
+                "\"fname\": " + fName + "," +
+                "\"lname\": " + lName + "," +
+                "\"age\": " + age +
+                "}";
+    }
 }
