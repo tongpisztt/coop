@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-
 import com.example.demo.entity.Student;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.model.StudentRequest;
@@ -11,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.List;
 
 import static com.example.demo.constant.StudentConstant.*;
 
@@ -30,12 +27,13 @@ public class StudentController {
     @GetMapping("/all")
     public ResponseEntity<?> getAllStudents() {
         try{
-            return new ResponseEntity<List<Collection<Student>>>(studentService.showAllStudents(), HttpStatus.OK);
+            return new ResponseEntity<>(studentService.getAllStudents(), HttpStatus.OK);
         }catch (BusinessException e) {
             if (e.getCode() == 10003) {
-                return new ResponseEntity<String>(ERROR_NOT_FOUND_ANY_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(ERROR_NOT_FOUND_ANY_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
             } else {
-                return new ResponseEntity<String>("System Error", HttpStatus.BAD_GATEWAY);
+                return new ResponseEntity<>("System Error", HttpStatus.INTERNAL_SERVER_ERROR);
+//                return new ResponseEntity<String>("System Error", HttpStatus.BAD_GATEWAY);
             }
         }
     }
@@ -43,8 +41,10 @@ public class StudentController {
     //http://localhost:8080/students//getStudent/62002
     @GetMapping(path = "/getStudent/{stdID}")
     public ResponseEntity<?> getStudent(@PathVariable Integer stdID){
+        Student student = new Student();
         try {
-            return new ResponseEntity<Student>(studentService.showStudent(stdID), HttpStatus.OK);
+//            return new ResponseEntity<Student>(studentService.getStudent(stdID), HttpStatus.OK);
+            student = studentService.getStudent(stdID);
         }catch (BusinessException e){
             if (e.getCode() == 10002) {
                 return new ResponseEntity<String>(ERROR_NOT_FOUND_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
@@ -52,13 +52,14 @@ public class StudentController {
                 return new ResponseEntity<String>("System Error", HttpStatus.BAD_GATEWAY);
             }
         }
+        return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
     //http://localhost:8080/addStudent
     @PostMapping("/add")
     public ResponseEntity<?> addStudent(@RequestBody StudentRequest request) {
         try {
-            return new ResponseEntity<Student>(studentService.saveStudent(request), HttpStatus.OK);
+            return new ResponseEntity<Student>(studentService.addStudent(request), HttpStatus.OK);
         } catch (BusinessException e) {
             if (e.getCode() == 10001) {
                 return new ResponseEntity<String>(ERROR_EXISTING_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);

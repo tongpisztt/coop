@@ -6,7 +6,6 @@ public class StudentConstant {
     public static final String ERROR_EXISTING_STUDENT_IN_DB = "Existing student data in database!";
     //public static final String SAVE_STUDENT_SUCCESSFULLY = "Save student data successfully!";
     public static final String DELETE_SUCCESSFULLY = "Delete student successfully!";
-    public static final String UPDATE_FIRST_NAME_SUCCESSFULLY = "Update student first name successfully!";
-
+    //public static final String UPDATE_FIRST_NAME_SUCCESSFULLY = "Update student first name successfully!";
 
 }

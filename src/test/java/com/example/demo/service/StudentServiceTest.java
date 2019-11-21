@@ -27,15 +27,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-
-@SpringBootTest
-//@RunWith(JUnit4.class)
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 /* annotation ที่บอกว่าคลาสนี้จะใช้ MockitoJUnitRunner ในการทดสอบ
 ใช้งาน Mockito ได้เลยแต่เปลี่ยนจาก @RunWith เป็น @ExtendWith ซึ่งเป็นการขยายความสามารถของ TestEngine ของ JUnit Platform ด้วย MockitoExtension
 แล้วก็สามารถใช้คุณสมบัติเดิมของ Mockito ได้เลย อย่างเช่น @Mock, @InjectMocks , @Spy */
-//@DisplayName("Demo Spring Boot with JUnit 5 + Mockito")
 public class StudentServiceTest {
 
     @Mock
@@ -54,13 +50,13 @@ public class StudentServiceTest {
 
     //---GoodCase---------------------------------------------------------------------------------------------------------------
     @Test
-    public void showAllStudents() throws BusinessException {
+    public void getAllStudents() throws BusinessException {
         Student expected1 = new Student(5L, 62005, "Prayuth", "Jundara", 100);
         Student expected2 = new Student(6L, 62006, "Prawit", "Wongkumlao", 90);
         List expectedList = Arrays.asList(expected1, expected2);
         when(studentRepository.findAll()).thenReturn(expectedList);
 
-        List actualList = studentService.showAllStudents();
+        List actualList = studentService.getAllStudents();
         assertAll("expected",
                 () -> assertEquals(expectedList, actualList)
         );
@@ -68,12 +64,12 @@ public class StudentServiceTest {
 
     @Test
     //กำหนดให้ method เป็น test method ของ JUnit
-    public void showStudent() throws BusinessException {
+    public void getStudent() throws BusinessException {
         int studentId = 62004;    //studentId ที่เรารู้ตั้งแต่แรกว่าใส่อะไรไป แล้วจะเอาไปเทียบกับที่บันทึกลง DB
         Student expected = new Student(4L, 62004, "Pareena", "Kraijub", 60);
         when(studentRepository.findBystdID(anyInt())).thenReturn(expected);    //เมื่อส่ง studentId = 62005 studentRepository.findBystdID แล้วจะ
 
-        Student actual = studentService.showStudent(studentId);        //obj ที่ได้จากการส่ง Student ID = 62005 ตรงๆ เข้า showStudent()
+        Student actual = studentService.getStudent(studentId);        //obj ที่ได้จากการส่ง Student ID = 62005 ตรงๆ เข้า showStudent()
 
         assertEquals(expected.getId(), actual.getId());    //assertEquals(ซ้าย:expected,ขวา:actual)
         assertEquals(expected.getStdID(), actual.getStdID());
@@ -83,12 +79,12 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void saveStudent() throws BusinessException {
+    public void addStudent() throws BusinessException {
         StudentRequest expectedRequest = new StudentRequest(7L, 62007, "Thanathon", "Juangroongruangkit", 40);
         Student expectedStudent = new Student(62007, "Thanathon", "Juangroongruangkit", 40);
 
         when(studentRepository.save(any(Student.class))).thenReturn(expectedStudent);
-        Student actual = studentService.saveStudent(expectedRequest);
+        Student actual = studentService.addStudent(expectedRequest);
         //actual = ค่าจริงที่ได้จากการเรียกใช้งาน service
 
         assertEquals(expectedStudent.getId(), actual.getId());
@@ -140,13 +136,32 @@ public class StudentServiceTest {
     }*/
 
     @Test(expected = BusinessException.class)
-    public void showAllStudentsCaseNotFoundAnyStudent() throws BusinessException {
+    public void getAllStudentsCaseNotFoundAnyStudent() throws BusinessException {
         //Student mockStudent = new Student(4L, 62004, "Pareena", "Kraijub", 60);   //ถ้าลองใส่ Student ไป แล้ว list.add(mockStudent); ต้องไม่มีการ throws อะไรออกมา
         List list = new ArrayList();
         //list.add(mockStudent);
         when(studentRepository.findAll()).thenReturn(list);
         try {
-            studentService.showAllStudents();
+            studentService.getAllStudents();
+        } catch (BusinessException e) {
+            System.out.println("BusinessException works!");
+            String errorMessage = String.format("Error code %d : %s", e.getCode(), e.getMessage());
+            System.out.println(errorMessage);
+            throw e;
+        }
+    }
+
+    @Test(expected = BusinessException.class)
+    public void getStudentCaseNotFoundThisStudent() throws BusinessException {
+        Integer requestStdIdOutOfDB = 62001;
+        Integer requestStdIdInDB = 62005;
+        Student expectedStdInDB = new Student(5L, 62005, "Prayuth", "Jundara", 100);
+
+        when(studentRepository.findBystdID(requestStdIdInDB)).thenReturn(expectedStdInDB);
+
+        try {
+            studentService.getStudent(requestStdIdOutOfDB);    //62001
+            //studentService.showStudent(requestStdIdInDB); //62005 มีใน DB จะ error เพราะไม่เกิด BusinessException
         } catch (BusinessException e) {
             System.out.println("BusinessException works!");
             String errorMessage = String.format("Error code %d : %s", e.getCode(), e.getMessage());
@@ -197,14 +212,14 @@ public class StudentServiceTest {
 
     //--WorstCase-CaseExisting---------------------------------------------------------------------------------------------------------------
     @Test(expected = BusinessException.class)   //OK
-    public void saveStudentCaseExisting() throws BusinessException {
+    public void addStudentCaseExisting() throws BusinessException {
         Student studentInDB = new Student(4L, 62004, "Pareena", "Kraijub", 60);
-        StudentRequest request = new StudentRequest(62004, "AAA", "BBB", 40);
+        StudentRequest request = new StudentRequest(null, 62004, "AAA", "BBB", 40);
         //StudentRequest request = new StudentRequest(62005, "AAA", "BBB", 40); //ถ้าเปลี่ยนเป็น 62005 จะ error เพราะ ไม่เจอ BusinessException
 
         when(studentRepository.findBystdID(eq(request.getStdID()))).thenReturn(studentInDB);    //mockข้อมูลเมื่อมีการเรียกใช้ในmothodในserviceนั้นๆ
 
-        studentService.saveStudent(request);
+        studentService.addStudent(request);
 
         verify(studentRepository, times(1)).findBystdID(anyInt());
     }

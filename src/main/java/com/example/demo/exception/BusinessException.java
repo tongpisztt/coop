@@ -12,7 +12,7 @@ public class BusinessException extends Exception{
         this.message = message;
     }
 
-    public BusinessException(String message) {
-        this.message = message;
-    }
+//    public BusinessException(String message) {
+//        this.message = message;
+//    }
 }

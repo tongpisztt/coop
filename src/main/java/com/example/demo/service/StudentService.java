@@ -19,26 +19,24 @@ public class StudentService extends Student{
     @Autowired
     StudentRepository studentRepository;
 
-    public List <Collection<Student>> showAllStudents() throws BusinessException {
+    public List<Student> getAllStudents() throws BusinessException {
         //ดัก ไม่พบ student สักคน + server error
-        Collection collection = studentRepository.findAll();
-        List list = new ArrayList();
-        list.addAll(collection);
+        List<Student> students = studentRepository.findAll();
 
-        if(collection.isEmpty())
+        if(students.isEmpty())
             throw new BusinessException(10003, ERROR_NOT_FOUND_ANY_STUDENT_IN_DB);
 
-        return list;
+        return students;
     }
 
-    public Student showStudent(Integer stdID) throws BusinessException {
+    public Student getStudent(Integer stdID) throws BusinessException {
         //ดัก หา student ID ไม่เจอ + server error
         if(studentRepository.findBystdID(stdID) == null)
             throw new BusinessException(10002, ERROR_NOT_FOUND_STUDENT_IN_DB);
         return studentRepository.findBystdID(stdID);
     }
 
-    public Student saveStudent(StudentRequest request) throws BusinessException {     //OK
+    public Student addStudent(StudentRequest request) throws BusinessException {     //OK
         //ดัก student ID ซ้ำ + server error
         if (checkExistingStudentId(request))    //ถ้ามี Student นี้อยู่แล้ว(!=null) ได้ true มาให้ throw exception
             throw new BusinessException(10001, ERROR_EXISTING_STUDENT_IN_DB);
