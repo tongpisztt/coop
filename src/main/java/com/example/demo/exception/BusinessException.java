@@ -11,8 +11,4 @@ public class BusinessException extends Exception{
         this.code = code;
         this.message = message;
     }
-
-//    public BusinessException(String message) {
-//        this.message = message;
-//    }
 }
