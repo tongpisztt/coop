@@ -1,10 +1,13 @@
 package com.example.demo.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
 
-@Entity @Data
+@Entity
+@Data       //getter setter
+@Builder    //ใช้กับ Model
 @Table(name = "Student", schema = "testdb")
 public class Student {
 

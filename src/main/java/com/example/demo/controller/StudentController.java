@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 import static com.example.demo.constant.StudentConstant.*;
 
 @RestController
@@ -26,9 +25,9 @@ public class StudentController {
     //http://localhost:8080/students
     @GetMapping("/all")
     public ResponseEntity<?> getAllStudents() {
-        try{
+        try {
             return new ResponseEntity<>(studentService.getAllStudents(), HttpStatus.OK);
-        }catch (BusinessException e) {
+        } catch (BusinessException e) {
             if (e.getCode() == 10003) {
                 return new ResponseEntity<>(ERROR_NOT_FOUND_ANY_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
             } else {
@@ -40,19 +39,18 @@ public class StudentController {
 
     //http://localhost:8080/students//getStudent/62002
     @GetMapping(path = "/getStudent/{stdID}")
-    public ResponseEntity<?> getStudent(@PathVariable Integer stdID){
-        Student student = new Student();
+    public ResponseEntity<?> getStudent(@PathVariable Integer stdID) {
         try {
-//            return new ResponseEntity<Student>(studentService.getStudent(stdID), HttpStatus.OK);
-            student = studentService.getStudent(stdID);
-        }catch (BusinessException e){
+            return new ResponseEntity<Student>(studentService.getStudent(stdID), HttpStatus.OK);
+//            student = studentService.getStudent(stdID);
+        } catch (BusinessException e) {
             if (e.getCode() == 10002) {
                 return new ResponseEntity<String>(ERROR_NOT_FOUND_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
             } else {
                 return new ResponseEntity<String>("System Error", HttpStatus.BAD_GATEWAY);
             }
         }
-        return new ResponseEntity<>(student, HttpStatus.OK);
+//        return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
     //http://localhost:8080/addStudent
@@ -70,7 +68,7 @@ public class StudentController {
     }
 
     //http://localhost:8080/delete/62006
-    @DeleteMapping(path ="/delete/{stdID}")
+    @DeleteMapping(path = "/delete/{stdID}")
     public ResponseEntity<?> deleteStudent(@PathVariable Integer stdID) {
         try {
             return new ResponseEntity<String>(studentService.deleteStudent(stdID), HttpStatus.OK);
@@ -84,11 +82,11 @@ public class StudentController {
     }
 
     //http://localhost:8080/update/62001/Jundara
-    @PutMapping(path ="/update/{stdID}/{fName}")
-    public ResponseEntity<?> updateStudentFirstName(@PathVariable Integer stdID,@PathVariable String fName) {
-        try{
+    @PutMapping(path = "/update/{stdID}/{fName}")
+    public ResponseEntity<?> updateStudentFirstName(@PathVariable Integer stdID, @PathVariable String fName) {
+        try {
             return new ResponseEntity<Student>(studentService.updateStudentFirstName(stdID, fName), HttpStatus.OK);
-        }catch (BusinessException e) {
+        } catch (BusinessException e) {
             if (e.getCode() == 10002) {
                 return new ResponseEntity<String>(ERROR_NOT_FOUND_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
             } else {

@@ -4,11 +4,10 @@ import com.example.demo.entity.Student;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.model.StudentRequest;
 import com.example.demo.repository.StudentRepository;
+import com.example.demo.repository.jdbc.JDBCStudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static com.example.demo.constant.StudentConstant.*;
@@ -18,6 +17,9 @@ public class StudentService extends Student{
 
     @Autowired
     StudentRepository studentRepository;
+
+    @Autowired
+    JDBCStudentRepository jdbcStudentRepository;
 
     public List<Student> getAllStudents() throws BusinessException {
         //ดัก ไม่พบ student สักคน + server error
@@ -31,9 +33,20 @@ public class StudentService extends Student{
 
     public Student getStudent(Integer stdID) throws BusinessException {
         //ดัก หา student ID ไม่เจอ + server error
-        if(studentRepository.findBystdID(stdID) == null)
+        Student s = jdbcStudentRepository.findBystdID(stdID);
+//        jdbcStudentRepository.findBystdID(stdID) return เป็นคลาส Student
+        if(s == null)
             throw new BusinessException(10002, ERROR_NOT_FOUND_STUDENT_IN_DB);
-        return studentRepository.findBystdID(stdID);
+        return s;
+
+//        public Student getStudent(Integer stdID) throws BusinessException {
+//            //ดัก หา student ID ไม่เจอ + server error
+//            List s = (List<Student>)jdbcStudentRepository.findBystdID(stdID);
+////        jdbcStudentRepository.findBystdID(stdID) return เป็นคลาส Student
+//            if (s.size() == 0)
+//                throw new BusinessException(10002, ERROR_NOT_FOUND_STUDENT_IN_DB);
+//            return jdbcStudentRepository.findBystdID(stdID);
+//        }
     }
 
     public Student addStudent(StudentRequest request) throws BusinessException {     //OK
@@ -41,7 +54,15 @@ public class StudentService extends Student{
         if (checkExistingStudentId(request))    //ถ้ามี Student นี้อยู่แล้ว(!=null) ได้ true มาให้ throw exception
             throw new BusinessException(10001, ERROR_EXISTING_STUDENT_IN_DB);
 
-        Student s = new Student(request.getStdID(), request.getFName(), request.getLName(), request.getAge());
+        Student s = Student.builder()
+                .stdID(request.getStdID())
+                .fName(request.getFName())
+                .lName(request.getLName())
+                .age(request.getAge())
+                .build();
+
+        //Student s = new Student(request.getStdID(), request.getFName(), request.getLName(), request.getAge());
+
         return studentRepository.save(s);
     }
 
