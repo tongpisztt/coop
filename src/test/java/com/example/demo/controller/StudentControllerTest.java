@@ -112,7 +112,7 @@ public class StudentControllerTest {        //เเทส API ...ถ้าเ�
         //Arrange
         StudentRequest studentRequest = new StudentRequest(null, 62005, "XXXXX", "Jundara", 100);
         Student studentInDB = new Student(5L, 62005, "XXXXX", "Jundara", 100);
-        when(studentService.addStudent(eq(studentRequest))).thenReturn(studentInDB);
+//        when(studentService.addStudent(eq(studentRequest))).thenReturn(studentInDB);
 
         ResponseEntity result = studentController.addStudent(studentRequest);
         Student student = (Student) result.getBody();
@@ -143,7 +143,7 @@ public class StudentControllerTest {        //เเทส API ...ถ้าเ�
         //Arrange
         String newFName = "XXXXX";
         Student studentAfterUpdate = new Student(5L, 62005, "XXXXX", "Jundara", 100);
-        when(studentService.updateStudentFirstName(62005, newFName)).thenReturn(studentAfterUpdate);
+//        when(studentService.updateStudentFirstName(62005, newFName)).thenReturn(studentAfterUpdate);
 
         ResponseEntity result = studentController.updateStudentFirstName(62005, newFName);
         Student student = (Student) result.getBody();

@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
     Student findBystdID(Integer stdID);
+    Student save(Student s);
     void deleteById(Long id);
     List<Student> findAll();
 

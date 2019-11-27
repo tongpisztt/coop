@@ -12,8 +12,8 @@ import javax.persistence.*;
 public class Student {
 
     @Id
-    @SequenceGenerator(name = "stdId_seq", sequenceName = "stdId_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stdId_seq")
+    //@SequenceGenerator(name = "id_seq", sequenceName = "id_seq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "id_seq")
     @Column(name = "ID")
     private Long id;
 

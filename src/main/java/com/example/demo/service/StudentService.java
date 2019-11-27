@@ -23,7 +23,7 @@ public class StudentService extends Student{
 
     public List<Student> getAllStudents() throws BusinessException {
         //ดัก ไม่พบ student สักคน + server error
-        List<Student> students = studentRepository.findAll();
+        List<Student> students = jdbcStudentRepository.findAll();
 
         if(students.isEmpty())
             throw new BusinessException(10003, ERROR_NOT_FOUND_ANY_STUDENT_IN_DB);
@@ -49,7 +49,7 @@ public class StudentService extends Student{
 //        }
     }
 
-    public Student addStudent(StudentRequest request) throws BusinessException {     //OK
+    public String addStudent(StudentRequest request) throws BusinessException {     //OK
         //ดัก student ID ซ้ำ + server error
         if (checkExistingStudentId(request))    //ถ้ามี Student นี้อยู่แล้ว(!=null) ได้ true มาให้ throw exception
             throw new BusinessException(10001, ERROR_EXISTING_STUDENT_IN_DB);
@@ -62,33 +62,34 @@ public class StudentService extends Student{
                 .build();
 
         //Student s = new Student(request.getStdID(), request.getFName(), request.getLName(), request.getAge());
-
-        return studentRepository.save(s);
+        jdbcStudentRepository.save(s);
+        return SAVE_STUDENT_SUCCESSFULLY;
     }
 
     public String deleteStudent(Integer stdID) throws BusinessException {       //OK
         //ดัก student ID ซ้ำ + server error
-        Student thisStudent = studentRepository.findBystdID(stdID);
+        Student thisStudent = jdbcStudentRepository.findBystdID(stdID);
         if(thisStudent == null)
             throw new BusinessException(10002, ERROR_NOT_FOUND_STUDENT_IN_DB);
 
-        studentRepository.deleteById(thisStudent.getId());
+        jdbcStudentRepository.deleteById(thisStudent.getId());
         return DELETE_SUCCESSFULLY ;
     }
 
-    public Student updateStudentFirstName(Integer stdID, String fName) throws BusinessException {
+    public String updateStudentFirstName(Integer stdID, String fName) throws BusinessException {
         //ดัก student ID ซ้ำ + server error + ไม่พบ student
         //String updateSuccessMessage = String.format("%s, Student ID : %d has been change first name to %s", UPDATE_FIRST_NAME_SUCCESSFULLY, stdID, fName) ;
-        Student thisStudent = studentRepository.findBystdID(stdID);
+        Student thisStudent = jdbcStudentRepository.findBystdID(stdID);
         if (thisStudent == null)
             throw new BusinessException(10002, ERROR_NOT_FOUND_STUDENT_IN_DB);
 
-        thisStudent.setFName(fName);
-        return studentRepository.save(thisStudent);
+//        thisStudent.setFName(fName);
+        jdbcStudentRepository.updateFirstName(stdID, fName);
+        return UPDATE_FIRST_NAME_SUCCESSFULLY;
     }
 
     private boolean checkExistingStudentId(StudentRequest request){        //OK
-        Student student = studentRepository.findBystdID(request.getStdID());
+        Student student = jdbcStudentRepository.findBystdID(request.getStdID());
         return student != null && student.getStdID().equals(request.getStdID());
         //ถ้ามี Student นี้อยู่แล้ว ได้ true && ถ้า student.getStdID = request.getStdID() จะได้ true => คืน true แปลว่า Existing
     }

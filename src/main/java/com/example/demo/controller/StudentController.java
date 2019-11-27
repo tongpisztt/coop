@@ -57,7 +57,7 @@ public class StudentController {
     @PostMapping("/add")
     public ResponseEntity<?> addStudent(@RequestBody StudentRequest request) {
         try {
-            return new ResponseEntity<Student>(studentService.addStudent(request), HttpStatus.OK);
+            return new ResponseEntity<String>(studentService.addStudent(request), HttpStatus.OK);
         } catch (BusinessException e) {
             if (e.getCode() == 10001) {
                 return new ResponseEntity<String>(ERROR_EXISTING_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
@@ -85,7 +85,7 @@ public class StudentController {
     @PutMapping(path = "/update/{stdID}/{fName}")
     public ResponseEntity<?> updateStudentFirstName(@PathVariable Integer stdID, @PathVariable String fName) {
         try {
-            return new ResponseEntity<Student>(studentService.updateStudentFirstName(stdID, fName), HttpStatus.OK);
+            return new ResponseEntity<String>(studentService.updateStudentFirstName(stdID, fName), HttpStatus.OK);
         } catch (BusinessException e) {
             if (e.getCode() == 10002) {
                 return new ResponseEntity<String>(ERROR_NOT_FOUND_STUDENT_IN_DB, HttpStatus.BAD_REQUEST);
